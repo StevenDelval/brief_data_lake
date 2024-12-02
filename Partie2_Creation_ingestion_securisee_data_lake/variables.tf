@@ -14,3 +14,8 @@ variable "data_lake_name" {
   description = "The data lake resource name."
 }
 
+variable "dl_filesystem_name" {
+  type        = string
+  description = "The data lake filesystem resource name."
+}
+
