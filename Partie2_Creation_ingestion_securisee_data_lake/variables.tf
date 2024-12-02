@@ -6,6 +6,11 @@ variable "resource_group_location" {
 
 variable "resource_group_name" {
   type        = string
-  default     = "RG_"
   description = "The resource group name."
 }
+
+variable "data_lake_name" {
+  type        = string
+  description = "The data lake resource name."
+}
+
