@@ -16,7 +16,7 @@ key_vault_url = os.environ.get('KEYVAULT_URL')
 secret_name = os.environ.get('SECRET_NAME')
 client_id_sp_data_lake = os.environ.get('SP_ID_PRINCIPAL')
 data_lake_name = os.environ.get('STORAGE_ACCOUNT_NAME')
-container_name = os.environ.get('CONTAINER_NAME')
+file_system_name = os.environ.get('FILE_SYSTEM_NAME')
 airbnb_dir_name = os.environ.get('AIRBNB_DIR_NAME')
 hf_dir_name = os.environ.get('HUGGING_FACE_DIR_NAME')
 
@@ -41,7 +41,7 @@ user_delegation_key = dl_service_client.get_user_delegation_key(start_time, expi
 
 sas_token = generate_directory_sas(
     account_name=data_lake_name,
-    file_system_name=container_name,
+    file_system_name=file_system_name,
     directory_name=airbnb_dir_name,
     credential=user_delegation_key,
     start=start_time,
@@ -52,7 +52,7 @@ sas_token = generate_directory_sas(
 # Ensure the SAS token is passed in for the DataLakeDirectoryClient
 dl_client_sas = DataLakeDirectoryClient(
     account_url=f"https://{data_lake_name}.dfs.core.windows.net/",
-    file_system_name=container_name,
+    file_system_name=file_system_name,
     directory_name=airbnb_dir_name,
     credential=sas_token  
 )
