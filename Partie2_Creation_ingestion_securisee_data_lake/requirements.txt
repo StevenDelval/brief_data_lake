@@ -1,5 +1,6 @@
 azure-identity==1.19.0
 azure-keyvault-secrets==4.9.0
 azure-storage-blob==12.24.0
+azure-storage-file-datalake==12.18.0
 pandas==2.2.3
 python-dotenv==1.0.1
