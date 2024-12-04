@@ -59,7 +59,7 @@ dl_client_sas = DataLakeDirectoryClient(
 
 # Get the DataLakeFileClient for the specific file
 file_name = "reviews5.csv"
-file_client = dl_client_sas.get_file_client(container_name,airbnb_dir_name+"/" +file_name)
+file_client = dl_client_sas.get_file_client(airbnb_dir_name+"/" +file_name)
 
 # Upload the file with proper headers
 with open(file_name, 'rb') as file_data:
