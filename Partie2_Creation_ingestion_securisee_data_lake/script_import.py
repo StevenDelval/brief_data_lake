@@ -1,9 +1,9 @@
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta,timezone
 from dotenv import load_dotenv
 from azure.identity import ClientSecretCredential
 from azure.keyvault.secrets import SecretClient
-from azure.storage.blob import BlobServiceClient, generate_container_sas,BlobSasPermissions
+from azure.storage.filedatalake import DataLakeServiceClient,DataLakeDirectoryClient,generate_directory_sas,DirectorySasPermissions
 
 # Load environment variables
 load_dotenv()
@@ -29,32 +29,38 @@ client_secret_sp_datalake = client_key_vault.get_secret(secret_name)._value
 
 # Authenticate with Azure Storage
 credential_sp_data_lake = ClientSecretCredential(tenant_id, client_id_sp_data_lake, client_secret_sp_datalake)
-blob_service_client = BlobServiceClient(
-    account_url=f"https://{data_lake_name}.blob.core.windows.net/",
+dl_service_client = DataLakeServiceClient(
+    account_url=f"https://{data_lake_name}.dfs.core.windows.net/",
     credential=credential_sp_data_lake
 )
 
 # SAS Token generation
-start_time = datetime.now()
-expiry_time = start_time + timedelta(minutes=10)
-user_delegation_key = blob_service_client.get_user_delegation_key(start_time, expiry_time)
+start_time = datetime.now(timezone.utc)
+expiry_time = start_time + timedelta(hours=6)
+user_delegation_key = dl_service_client.get_user_delegation_key(start_time, expiry_time)
 
-sas_token = generate_container_sas(
+sas_token = generate_directory_sas(
     account_name=data_lake_name,
-    container_name=f"{container_name}/{airbnb_dir_name}",
-    user_delegation_key=user_delegation_key,  # Pass the UserDelegationKey here
+    file_system_name=container_name,
+    directory_name=airbnb_dir_name,
+    credential=user_delegation_key,
+    start=start_time,
     expiry=expiry_time,
-    permission=BlobSasPermissions(read=True,write=True)
+    permission=DirectorySasPermissions(read=True,write=True),
 )
 
+# Ensure the SAS token is passed in for the DataLakeDirectoryClient
+dl_client_sas = DataLakeDirectoryClient(
+    account_url=f"https://{data_lake_name}.dfs.core.windows.net/",
+    file_system_name=container_name,
+    directory_name=airbnb_dir_name,
+    credential=sas_token  
+)
 
-# Upload the CSV file
-local_csv_path = "reviews.csv"
-client_with_sas = BlobServiceClient(
-            account_url=f"https://{data_lake_name}.blob.core.windows.net/",
-            credential=sas_token
-            )
+# Get the DataLakeFileClient for the specific file
+file_name = "reviews5.csv"
+file_client = dl_client_sas.get_file_client(container_name,airbnb_dir_name+"/" +file_name)
 
-container_client = client_with_sas.get_container_client(container_name)
-with open(local_csv_path, "rb") as data:
-    container_client.upload_blob(local_csv_path,data, overwrite=True)
+# Upload the file with proper headers
+with open(file_name, 'rb') as file_data:
+    file_client.upload_data(file_data, overwrite=True)
