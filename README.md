@@ -24,3 +24,11 @@ Acquérir une **vision panoramique** des méthodes de sécurité disponibles sur
 L’objectif de cette partie est de créer des scripts Python pour stocker des données dans un Azure Data Lake Storage Gen 2 de manière sécurisée. Vous allez vous concentrer sur la gestion des identités et des secrets en utilisant des outils comme Azure Key Vault, tout en pratiquant les concepts de sécurité avec Azure.
 
 ### [Rendue](Partie2_Creation_ingestion_securisee_data_lake/rendue.md)
+
+## Partie 3 : Configuration d'Azure Databricks
+
+### **Objectif**
+
+Configurer Azure Databricks pour permettre à l'équipe Data Science d'analyser les données, tout en mettant en œuvre les mesures de sécurité appropriées.
+
+### [Rendue](Partie3_Azure_Databricks/rendue.md)
