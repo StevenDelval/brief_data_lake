@@ -32,3 +32,17 @@ L’objectif de cette partie est de créer des scripts Python pour stocker des d
 Configurer Azure Databricks pour permettre à l'équipe Data Science d'analyser les données, tout en mettant en œuvre les mesures de sécurité appropriées.
 
 ### [Rendue](Partie3_Azure_Databricks/rendue.md)
+
+## Partie 4 : Monitoring et Alertes
+
+### **Objectif**
+
+Mettre en place un système de monitoring et d'alertes pour surveiller le Data Lake et être en mesure de réagir rapidement en cas d'incidents.
+
+L’objectif de cette partie est de découvrir `Logs Analytics`, `Activity logs`, `Metrics`, `insights` et `Alerts`. Ce sont des services que vous pouvez atteindre de différentes façons. Par exemple, dans votre `storage account`, il y a un section `monitoring` avec ces services pré-configurés pour surveiller votre instance de `storage account`. Vous pouvez également utiliser ces services de maniére indépendante, en faisant par exemple une recherche `Metrics` dans la barre de recherche. Ou enfin vous pouvez les utiliser via le service unifié `Monitor`.
+
+### [Rendue](Partie4_Monitoring_Alertes/rendue.md)
+
+
+# Contenu du groupe de ressources
+![image](Partie4_Monitoring_Alertes/Contenu_rg.png)
