@@ -4,3 +4,4 @@ azure-storage-blob==12.24.0
 azure-storage-file-datalake==12.18.0
 pandas==2.2.3
 python-dotenv==1.0.1
+beautifulsoup4==4.12.3
