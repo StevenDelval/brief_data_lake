@@ -39,5 +39,7 @@ AIRBNB_DIR_NAME="Airbnb_csv"
 HUGGING_FACE_DIR_NAME="Hugging_Face_parquet"
 ```
 
+J'exécute le script **script_import.py**, qui se connecte au Key Vault en tant que service principal **keyvault-sd**, ce qui me permet de récupérer le secret du service principal **dl-sas-read-sd** pour me connecter en tant que celui-ci au Data Lake afin de générer un SAS. Ensuite, je me reconnecte au Data Lake via le SAS. Enfin, je vais chercher les URL des fichiers CSV des avis sur la page https://insideairbnb.com/get-the-data/ et je télécharge les CSV dans le Data Lake.
+
 Capture d'écran du Data Lake après l'exécution du script :
 ![image](img/resultal.script_import.png)
