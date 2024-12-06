@@ -1,5 +1,4 @@
 
-
 Pour créer les ressources :
 ```
 terraform init 
@@ -13,6 +12,18 @@ resource_group_location = "francecentral"
 data_lake_name          = "sdelvaldatalake"
 dl_filesystem_name      = "sddatastorage"
 ```
+
+Cela permet de créer un groupe de ressources et un Data Lake avec un conteneur contenant deux répertoires.
+Via le portail, je crée dans l'Entra ID 2 app registration (Service principal) nommés **dl-sas-read-sd** et **keyvault-sd**.
+Puis, je crée un Key Vault.
+
+Je crée les secrets pour se connecter aux services principaux. Celui de **dl-sas-read-sd** sera stocké dans le Key Vault et celui de **keyvault-sd** dans le fichier .env.
+
+Dans l'IAM du Data Lake, je donne le rôle de "Storage Data Delegator and Writer" au service principal **dl-sas-read-sd**, afin que celui-ci puisse générer des SAS.
+
+Dans les Access Policies, je donne uniquement la permission au service principal **keyvault-sd** de récupérer les clés, secrets et certificats.
+Capture d'écran des Access Policies :
+![image](img/accesspolicies.png)
 
 Dans le fichier .env :
 ```
