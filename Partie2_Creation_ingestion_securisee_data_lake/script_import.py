@@ -75,9 +75,9 @@ def upload_reviews_csv_in_dl(csv_url: str, dl_client: DataLakeDirectoryClient) -
         path_parts = parsed_url.path.strip("/").split("/")
         
         # Extract country, city, and date
-        country = path_parts[1]
-        city = path_parts[3]
-        date = path_parts[4]
+        country = path_parts[0]
+        city = path_parts[2]
+        date = path_parts[3]
         
         # Generate a file name
         new_file_name = f"{country}_{city}_{date}_reviews.csv"
