@@ -151,7 +151,9 @@ dl_client_sas = DataLakeDirectoryClient(
     credential=sas_token
 )
 
+# Get the list of review CSV URLs for a specific country (e.g., "spain")
 reviews_links = get_reviews_csv_url("spain")
 
 for reviews in reviews_links:
-    upload_reviews_csv_in_dl(reviews,dl_client_sas)
+    # Upload each review CSV file to the Azure Data Lake using the provided directory client
+    upload_reviews_csv_in_dl(reviews, dl_client_sas)
