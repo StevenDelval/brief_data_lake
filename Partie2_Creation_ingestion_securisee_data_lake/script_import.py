@@ -1,4 +1,8 @@
 import os
+import requests
+import pandas as pd
+from urllib.parse import urlparse
+from bs4 import BeautifulSoup
 from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 from azure.identity import ClientSecretCredential
@@ -9,6 +13,87 @@ from azure.storage.filedatalake import (
     generate_directory_sas,
     DirectorySasPermissions,
 )
+
+def get_reviews_csv_url(country: str = "spain") -> list | None:
+    """
+    Fetches all review CSV URLs for a specified country from the Inside Airbnb data page.
+
+    Args:
+        country (str): The name of the country to filter URLs for (default is "spain").
+
+    Returns:
+        list | None: 
+            - A list of URLs (strings) pointing to review CSV files for the specified country.
+            - Returns None if the HTTP request fails.
+
+    Example:
+        >>> get_reviews_csv_url("spain")
+        ['https://data.insideairbnb.com/spain/barcelona/2024-01-01/data/reviews.csv',
+         'https://data.insideairbnb.com/spain/madrid/2024-01-01/data/reviews.csv']
+
+    Notes:
+        - This function relies on the structure of the Inside Airbnb data page.
+        - It uses BeautifulSoup to parse HTML and filters `<a>` tags based on `href` attributes.
+        - The HTTP status of the response is checked before processing.
+    """
+    # Target page URL
+    url = "https://insideairbnb.com/get-the-data/"
+    # Make an HTTP request to get the page content
+    response = requests.get(url)
+    if response.status_code == 200:
+        # Parse the HTML content of the page with BeautifulSoup
+        soup = BeautifulSoup(response.content, "html.parser")
+        
+        # Find all <a> tags on the page
+        links = soup.find_all("a", href=True)
+        
+        # Filter links that start with the prefix and end with reviews.csv
+        hrefs = [
+            link["href"] for link in links
+            if link["href"].startswith(f"https://data.insideairbnb.com/{country}/") and link["href"].endswith("reviews.csv")
+        ]
+        
+        return hrefs
+
+def upload_reviews_csv_in_dl(csv_url: str, dl_client: DataLakeDirectoryClient) -> None:
+    """
+    Fetches a reviews CSV file from a specified URL, generates a descriptive filename 
+    (including country, city, and date), and uploads its content to an Azure Data Lake.
+
+    Args:
+        csv_url (str): The URL of the reviews CSV file to fetch.
+        dl_client (DataLakeDirectoryClient): The Azure DataLakeDirectoryClient representing 
+            the target directory in the Azure Data Lake where the file will be uploaded.
+
+    Returns:
+        None: This function does not return any value.
+
+    """
+    try:
+        # Parse the URL to extract components
+        parsed_url = urlparse(csv_url)
+        path_parts = parsed_url.path.strip("/").split("/")
+        
+        # Extract country, city, and date
+        country = path_parts[1]
+        city = path_parts[3]
+        date = path_parts[4]
+        
+        # Generate a file name
+        new_file_name = f"{country}_{city}_{date}_reviews.csv"
+        file_client = dl_client.get_file_client(new_file_name)
+        
+        # Load the CSV from the provided URL into a Pandas DataFrame
+        df = pd.read_csv(csv_url)
+        
+        # Convert the DataFrame to a CSV string
+        file_data = df.to_csv(index=False)
+        
+        # Upload the CSV data to the Data Lake
+        file_client.upload_data(file_data, overwrite=True)
+
+    except Exception as e:
+        print(f"An error occurred while uploading the file: {e}")
 
 # Load environment variables from the .env file
 load_dotenv()
@@ -66,10 +151,7 @@ dl_client_sas = DataLakeDirectoryClient(
     credential=sas_token
 )
 
-# Define the name of the file to be uploaded
-file_name = "reviews6.csv"
-file_client = dl_client_sas.get_file_client(file_name)
+reviews_links = get_reviews_csv_url("spain")
 
-# Upload the file to the Data Lake directory
-with open(file_name, 'rb') as file_data:
-    file_client.upload_data(file_data, overwrite=True)
+for reviews in reviews_links:
+    upload_reviews_csv_in_dl(reviews,dl_client_sas)
